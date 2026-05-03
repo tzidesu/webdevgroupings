@@ -9,8 +9,8 @@ body {
   background: rgb(161, 21, 21);
   color: white;
   padding: 20px;
-  min-height: 94.5vh; /* covers screen */
-  height: auto;      /* grows with content */
+  min-height: 94.5vh; 
+  height: auto;      
 }
 
 .sidebar nav a {
@@ -45,12 +45,12 @@ body {
 }
 
 .section {
-  display: none; /* hide all sections by default */
+  display: none; 
   scroll-margin-top: 50px;
 }
 
 .section:target {
-  display: block; /* show only the targeted section */
+  display: block; 
 }
 
 .info-boxes {
@@ -159,11 +159,11 @@ textarea {
 }
 
 .necessity-list {
-  list-style-type: disc;   /* bullet points */
-  margin: 10px 0 0 20px;   /* spacing and indent */
+  list-style-type: disc;   
+  margin: 10px 0 0 20px;   
   padding: 0;
 }
 
 .necessity-list li {
-  margin-bottom: 8px;      /* space between items */
+  margin-bottom: 8px;      
 }
