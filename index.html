@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PUP Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<!-- Sidebar -->
+
+<body>
+  <div class="sidebar">
+    <div class="logopup">
+    <img src="assests/puplogo.png" alt="PUP Logo" class="logo">
+    <h2>PUP</h2>
+    </div>
+    <nav>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#feedback">Classroom Feedback</a>
+      <a href="#readiness">Disaster Readiness</a>
+      <a href="#admin">Admin Panel</a>
+    </nav>
+  </div>
+
+<!-- Dashboard -->
+
+  <div class="main-content">
+
+    <section id="dashboard" class="section">
+      <h1>HI Y/N! Welcome back.</h1>
+      <div class="info-boxes">
+        <div class="box">Room comfort: 67%</div>
+        <div class="box">School Status: Safe</div>
+        <div class="box">Active drills: 0/00/0000</div>
+      </div>
+      <div class="heatmap">
+        <h2>School Safety Heatmap</h2>
+        <p>[lapag dito heatmap chat]</p>
+      </div>
+      <button class="hazard-btn">Report Hazard</button>
+    </section>
+
+<!-- Classroom Feedback -->
+
+<section id="feedback" class="section">
+  <h2>Classroom Feedback</h2>
+
+  <form class="feedback-form">
+    <!-- Student Info -->
+    <fieldset>
+      <legend>Student Info</legend>
+
+      <label for="student-name">Name:</label>
+      <input type="text" id="student-name" name="student-name" placeholder="Enter your name">
+
+      <label for="yr-section">Year & Section:</label>
+      <select id="yr-section" name="yr-section">
+        <option value="yrsec">Select your year and section</option>
+        <option value="dit21">DIT 2-1</option>
+        <option value="dit22">DIT 2-2</option>
+        <option value="dit23">DIT 2-3</option>
+      </select>
+    </fieldset>
+
+    <!-- Feedback -->
+    <fieldset>
+      <legend>Feedback</legend>
+
+      <label for="classroom">Room Number:</label>
+      <select id="roomnum" name="roomnum">
+        <option value="roomno">Select the Classroom number</option>
+        <option value="room201">Room 201</option>
+        <option value="room202">Room 202</option>
+        <option value="room203">Room 203</option>
+      </select>
+
+      <label>Classroom Rating:</label>
+      <div class="rating">
+        <label><input type="radio" name="rating" value="1"> ⭐</label>
+        <label><input type="radio" name="rating" value="2"> ⭐⭐</label>
+        <label><input type="radio" name="rating" value="3"> ⭐⭐⭐</label>
+        <label><input type="radio" name="rating" value="4"> ⭐⭐⭐⭐</label>
+        <label><input type="radio" name="rating" value="5"> ⭐⭐⭐⭐⭐</label>
+      </div>
+
+      <label for="feedback-area">Suggestions for Improvement:</label>
+      <textarea id="feedback-area" name="feedback-area" rows="4" placeholder="Write your suggestions here..."></textarea>
+
+      <label>
+        <input type="checkbox" name="anonymous"> Submit anonymously
+      </label>
+    </fieldset>
+
+    <button type="submit" class="submit-btn">Submit Feedback</button>
+  </form>
+</section>
+
+<!-- Disaster Readiness -->
+
+    <!-- Disaster Readiness -->
+<section id="readiness" class="section">
+  <h2>Disaster Preparedness Survey</h2>
+
+  <form class="readiness-form">
+    <!-- Household Info -->
+    <fieldset>
+      <legend>Household Info</legend>
+
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" placeholder="Enter your address">
+
+      <label for="emergency-contact">In Case of Emergency Contact:</label>
+      <input type="tel" id="emergency-contact" name="emergency-contact" maxlength="11" pattern="\d{11}" placeholder="Enter contact number">
+    </fieldset>
+
+    <!-- Preparedness Check -->
+    <fieldset>
+      <legend>Preparedness Check</legend>
+
+      <label>Do you know any evacuation path in your school?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="evacpath" value="yes"> Yes</label>
+        <label><input type="radio" name="evacpath" value="no"> No</label>
+      </div>
+
+      <label>What necessity is missing in your classroom? (Check all that apply)</label>
+      <div class="checkbox-group">
+        <ul class="necessity-list">
+            <li>
+            <label><input type="checkbox" name="necessity" value="firstaidkit">First Aid Kit</label>
+            </li>
+            <li>
+            <label><input type="checkbox" name="necessity" value="flashlight">Flashlight</label>
+            </li>
+            <li>
+            <label><input type="checkbox" name="necessity" value="exitsign">Exit Signage</label>
+            </li>
+            <li>
+            <label><input type="checkbox" name="necessity" value="tools">Tools</label>
+            </li>
+        </ul>
+      </div>
+    </fieldset>
+
+    <!-- Past Disaster Experience -->
+    <fieldset>
+      <legend>Past Disaster Experience</legend>
+
+      <label for="experience">Please describe:</label>
+      <textarea id="experience" name="experience" rows="4" placeholder="Share your past disaster experience..."></textarea>
+    </fieldset>
+
+    <button type="submit" class="submit-btn">Update Readiness Status</button>
+  </form>
+</section>
+
+
+<!-- Admin Panel -->
+
+    <section id="admin" class="section">
+      <h2>Admin Panel</h2>
+      <p>[Placeholder for admin controls]</p>
+    </section>
+  </div>
+</body>
+</html>
