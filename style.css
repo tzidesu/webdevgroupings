@@ -260,3 +260,75 @@ textarea {
     background: #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
+
+/* Admin Specific Styles */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-alert {
+  background: var(--danger);
+  background-color: rgb(161, 21, 21);
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.admin-table th, .admin-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.status-pill {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.status-pill.URGENT {
+    background: #7f1d1d; /* Dark Red */
+    color: white;
+    animation: pulse 1.5s infinite; /* Make it blink! */
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.status-pill.pending { background: #fffbeb; color: #f59e0b; }
+.status-pill.urgent { background: #fef2f2; color: #ef4444; }
+.status-pill.resolved { background: #f0fdf4; color: #10b981; }
+
+.resolve-btn {
+  background: rgb(161, 21, 21);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.req-item {
+    animation: slideIn 0.5s ease-out;
+}
