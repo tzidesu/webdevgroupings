@@ -1,158 +1,254 @@
+// 1. FIREBASE IMPORTS
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import {
+   getFirestore,
+   collection,
+   addDoc,
+   onSnapshot,
+   query,
+   orderBy,
+   serverTimestamp,
+   updateDoc,
+   doc,
+   where
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+
+// 2. YOUR CONFIGURATION
+const firebaseConfig = {
+   apiKey: "AIzaSyCQGcvANo3uxcwIXp9sBAhcz3mCaTmTqH8",
+   authDomain: "pup-schoolsafetysystem.firebaseapp.com",
+   projectId: "pup-schoolsafetysystem",
+   symbolicId: "pup-schoolsafetysystem",
+   projectId: "pup-schoolsafetysystem",
+   storageBucket: "pup-schoolsafetysystem.firebasestorage.app",
+   messagingSenderId: "150771374457",
+   appId: "1:150771374457:web:3e238dfb6ac75798f177a8",
+   measurementId: "G-JJHFMRS80K"
+};
+
+
+// 3. INITIALIZE FIREBASE
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
 document.addEventListener('DOMContentLoaded', () => {
-// SELECTORS
-    const navLinks = document.querySelectorAll('.sidebar nav a');
-    const sections = document.querySelectorAll('.section');
-    const campusMap = document.getElementById('campusMap');
-    const feedbackForm = document.querySelector('.feedback-form');
-    const readinessForm = document.querySelector('.readiness-form');
-    const queryList = document.getElementById('queryList');
-    const notifHub = document.getElementById('notif-hub');
+   // UI Selectors
+   const navLinks = document.querySelectorAll('.sidebar nav a');
+   const sections = document.querySelectorAll('.section');
+   const campusMap = document.getElementById('campusMap');
+   const notifHub = document.getElementById('notif-hub');
+   const issueSelect = document.getElementById('issue-type');
+   const anonCheckbox = document.getElementById('anon-check');
 
-// NAVIGATION LOGIC (Tab Switching)
-    function showSection(id) {
-        // Hide all sections first
-        sections.forEach(section => {
-            section.style.display = 'none';
-        });
 
-        // Show the targeted section
-        const target = document.getElementById(id.replace('#', ''));
-        if (target) {
-            target.style.display = 'block';
-        }
-    }
+   // --- LIVE COUNTERS (PENDING & RESOLVED) ---
+  
+   // Listen for Pending/Urgent
+   const pendingQuery = query(collection(db, "reports"), where("status", "in", ["pending", "URGENT"]));
+   onSnapshot(pendingQuery, (snapshot) => {
+       const countElement = document.getElementById('pending-count');
+       if (countElement) countElement.textContent = snapshot.size;
+   });
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const href = link.getAttribute('href');
-            showSection(href);
-            
-            // Visual feedback for sidebar
-            navLinks.forEach(l => l.style.background = 'transparent');
-            link.style.background = 'rgba(255,255,255,0.2)';
-        });
-    });
 
-    // Initialize the view on Dashboard
-    showSection('#dashboard');
+   // Listen for Resolved (Real-Time)
+   const resolvedQuery = query(collection(db, "reports"), where("status", "==", "resolved"));
+   onSnapshot(resolvedQuery, (snapshot) => {
+       const resolvedCountElement = document.getElementById('resolved-count');
+       if (resolvedCountElement) resolvedCountElement.textContent = snapshot.size;
+   });
 
-// INTERACTIVE MAP PINNING
-    if (campusMap) {
-        campusMap.onclick = function(e) {
-            const rect = this.getBoundingClientRect();
-            // Calculate percentage coordinates for responsiveness
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            
-            const pin = document.createElement('div');
-            // Uses your CSS class m-hazard for the pulsing red effect
-            pin.className = 'marker m-hazard'; 
-            pin.style.left = x + '%'; 
-            pin.style.top = y + '%';
-            this.appendChild(pin);
-            
-            notify("Hazard report pinned to map and logged.", "danger");
-            addRequestToHistory("Map Hazard Report", "Campus Map Pin");
-        };
-    }
 
-// CLASSROOM FEEDBACK SUBMISSION
-    if (feedbackForm) {
-        feedbackForm.onsubmit = function(e) {
-            e.preventDefault();
-            const room = document.getElementById('roomnum').value;
-            const isAnon = this.querySelector('input[name="anonymous"]').checked;
-            
-            notify(`Feedback for ${room} submitted ${isAnon ? 'anonymously' : ''}.`, "success");
-            addRequestToHistory("Classroom Feedback", room);
-            
-            this.reset();
-            showSection('#query'); // Redirect to track the request
-        };
-    }
+   // --- A. NAVIGATION LOGIC ---
+   function showSection(id) {
+       sections.forEach(s => s.style.display = 'none');
+       const target = document.getElementById(id.replace('#', ''));
+       if (target) target.style.display = 'block';
+      
+       navLinks.forEach(link => {
+           link.classList.toggle('active', link.getAttribute('href') === id);
+       });
+   }
 
-    // DISASTER READINESS SUBMISSION
-    if (readinessForm) {
-        readinessForm.onsubmit = function(e) {
-            e.preventDefault();
-            
-            // Update UI
-            notify("Readiness status and disaster experience updated.", "success");
-            addRequestToHistory("Readiness Survey", "Student Profile");
-            
-            this.reset();
-            showSection('#dashboard'); // Return home after big update
-        };
-    }
 
-// DYNAMIC HISTORY UPDATE (The Query Section)
-    function addRequestToHistory(type, location) {
-        if (!queryList) return;
+   navLinks.forEach(link => {
+       link.addEventListener('click', (e) => {
+           e.preventDefault();
+           showSection(link.getAttribute('href'));
+       });
+   });
 
-        const newItem = document.createElement('div');
-        newItem.className = 'req-item';
-        // Applying inline styles to ensure visibility with your provided CSS
-        newItem.style.borderLeft = '5px solid #f59e0b';
-        newItem.style.background = '#fffbeb';
-        newItem.style.padding = '15px';
-        newItem.style.marginBottom = '10px';
-        newItem.style.borderRadius = '8px';
-        newItem.style.display = 'flex';
-        newItem.style.justifyContent = 'space-between';
-        newItem.style.alignItems = 'center';
-        
-        newItem.innerHTML = `
-            <div>
-                <strong>${type}</strong><br>
-                <small>${location} | Submitted: ${new Date().toLocaleDateString()}</small>
-            </div>
-            <span style="color: #f59e0b; font-weight: bold;">PENDING</span>
-        `;
-        
-        // Add new item to the top of the list
-        queryList.prepend(newItem);
-    }
 
-// NOTIFICATION SYSTEM (Toast UI)
-    function notify(msg, type) {
-        if (!notifHub) return;
+   showSection('#dashboard');
 
-        const toast = document.createElement('div');
-        toast.className = 'toast';
 
-        // PUP Red theme for danger, Success Green for others
-        const color = type === 'danger' ? 'rgb(161, 21, 21)' : '#10b981';
-        
-        toast.style.cssText = `
-            background: white; 
-            border-left: 5px solid ${color}; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            border-radius: 5px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            animation: slideIn 0.3s ease;
-        `;
-        
-        toast.innerHTML = `<strong>System:</strong> ${msg}`;
-        notifHub.appendChild(toast);
-        
-        // Auto-remove notification after 4 seconds
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            toast.style.transition = '0.5s';
-            setTimeout(() => toast.remove(), 500);
-        }, 4000);
-    }
+   // --- B. REAL-TIME MAP LOGIC ---
+   onSnapshot(collection(db, "hazards"), (snapshot) => {
+       snapshot.docChanges().forEach((change) => {
+           if (change.type === "added") {
+               const data = change.doc.data();
+               const pin = document.createElement('div');
+               pin.className = 'marker m-hazard';
+               pin.style.left = data.x + '%';
+               pin.style.top = data.y + '%';
+               campusMap.appendChild(pin);
+           }
+       });
+   });
+
+
+   campusMap.addEventListener('click', async (e) => {
+       const rect = campusMap.getBoundingClientRect();
+       const x = ((e.clientX - rect.left) / rect.width) * 100;
+       const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+
+       try {
+           await addDoc(collection(db, "hazards"), { x, y, timestamp: serverTimestamp() });
+           showToast("Hazard location reported.", "danger");
+       } catch (err) { console.error(err); }
+   });
+
+
+   // --- C. FORM SUBMISSIONS ---
+   const handleFormSubmit = async (e, type) => {
+       e.preventDefault();
+       const formData = new FormData(e.target);
+       const data = Object.fromEntries(formData.entries());
+
+
+       const urgentKeywords = ["fire", "flood", "earthquake", "injury", "help"];
+       const messageText = (data.suggestions || data.experience || "").toLowerCase();
+       const isUrgent = urgentKeywords.some(word => messageText.includes(word));
+
+
+       if (type === "Classroom Feedback" && anonCheckbox?.checked) {
+           data['student-name'] = "Anonymous Student";
+       }
+
+
+       try {
+           await addDoc(collection(db, "reports"), {
+               ...data,
+               type: type,
+               status: isUrgent ? "URGENT" : "pending",
+               timestamp: serverTimestamp()
+           });
+           showToast(isUrgent ? "🚨 URGENT Sent!" : "Submitted!", isUrgent ? "danger" : "success");
+           e.target.reset();
+           showSection('#query');
+       } catch (err) { console.error(err); }
+   };
+
+
+   document.querySelector('.feedback-form').onsubmit = (e) => handleFormSubmit(e, "Classroom Feedback");
+   document.querySelector('.readiness-form').onsubmit = (e) => handleFormSubmit(e, "Disaster Readiness");
+
+
+   // --- D. REAL-TIME HISTORY & ADMIN PANEL ---
+   const q = query(collection(db, "reports"), orderBy("timestamp", "desc"));
+
+
+   onSnapshot(q, (snapshot) => {
+       const queryList = document.getElementById('queryList');
+       const adminTable = document.getElementById('admin-table-body');
+      
+       if (queryList) queryList.innerHTML = "";
+       if (adminTable) adminTable.innerHTML = "";
+
+
+       snapshot.forEach((docSnap) => {
+           const data = docSnap.data();
+           const id = docSnap.id;
+          
+           // Handle timestamp formatting
+           const timestamp = data.timestamp ? data.timestamp.toDate() : new Date();
+           const dateStr = timestamp.toLocaleDateString() + " " + timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          
+           // Dynamic Status Colors
+           const statusColor = data.status === 'resolved' ? '#10b981' : (data.status === 'URGENT' ? '#ef4444' : '#f59e0b');
+
+
+           // 1. Update Request History (Student View)
+           if (queryList) {
+               queryList.insertAdjacentHTML('beforeend', `
+                   <div class="req-item" style="border-left-color: ${statusColor}">
+                       <div><strong>${data.type}</strong><br><small>${dateStr}</small></div>
+                       <span style="color: ${statusColor}; font-weight:bold;">${data.status.toUpperCase()}</span>
+                   </div>`);
+           }
+
+
+           // 2. Update Admin Management Table
+           if (adminTable) {
+               let infoDisplay = "";
+              
+               if (data.type === "Classroom Feedback") {
+                   // Shows Room, Name, and Year/Section
+                   infoDisplay = `
+                       <strong>Rm: ${data.roomnum || 'N/A'}</strong><br>
+                       <small>${data['student-name'] || 'Anonymous'}</small><br>
+                       <small>Sec: ${data['yr-section'] || 'N/A'}</small>`;
+               } else if (data.type === "Disaster Readiness") {
+                   // Shows Address and Emergency Contact Number
+                   infoDisplay = `
+                       <strong>Loc: ${data.address || 'N/A'}</strong><br>
+                       <small>Contact: ${data['emergency-contact'] || 'N/A'}</small>`;
+               } else {
+                   infoDisplay = "Campus Map Alert";
+               }
+
+
+               adminTable.insertAdjacentHTML('beforeend', `
+                   <tr>
+                       <td>${dateStr}</td>
+                       <td>${data.type}</td>
+                       <td>${infoDisplay}</td>
+                       <td><span class="status-pill ${data.status}">${data.status.toUpperCase()}</span></td>
+                       <td>
+                           ${data.status !== 'resolved'
+                               ? `<button class="resolve-btn" data-id="${id}">Resolve</button>`
+                               : `<span style="color:green; font-weight:bold;">✓ Fixed</span>`}
+                       </td>
+                   </tr>`);
+           }
+       });
+
+
+       // Re-bind click events for Resolve buttons
+       document.querySelectorAll('.resolve-btn').forEach(btn => {
+           btn.onclick = async () => {
+               const docRef = doc(db, "reports", btn.getAttribute('data-id'));
+               try {
+                   await updateDoc(docRef, { status: "resolved" });
+                   showToast("Issue Marked as Resolved!", "success");
+               } catch (err) {
+                   console.error("Resolve Error:", err);
+                   showToast("Update failed.", "danger");
+               }
+           };
+       });
+   });
+
+
+   // --- E. UTILITY FUNCTIONS ---
+   function showToast(msg, type) {
+       const toast = document.createElement('div');
+       toast.className = 'toast';
+       toast.style.borderLeftColor = type === 'danger' ? 'red' : '#10b981';
+       toast.innerHTML = `<strong>System:</strong> ${msg}`;
+       notifHub.appendChild(toast);
+       setTimeout(() => toast.remove(), 4000);
+   }
+
+
+   // Global Switcher
+   window.quickSwitch = (id) => {
+       document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+       const target = document.getElementById(id.replace('#',''));
+       if(target) target.style.display = 'block';
+   };
 });
 
-// GLOBAL EMERGENCY HELPER
-function quickSwitch(id) {
-    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-    const target = document.getElementById(id);
-    if (target) {
-        target.style.display = 'block';
-        window.scrollTo(0, 0);
-    }
-}
