@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PUP School Safety System</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+
+<!-- ===== LOG IN ===== -->
+<div id="login-page" class="login-page">
+  <div class="login-bg">
+    <div class="login-bg-overlay"></div>
+    <div class="aerial-grid"></div>
+  </div>
+
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-logo-ring">
+      </div>
+      <div>
+        <h1 class="login-title">PUP Safety System</h1>
+        <p class="login-subtitle">Polytechnic University of the Philippines</p>
+      </div>
+    </div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" data-tab="login">Sign In</button>
+      <button class="login-tab" data-tab="register">Register</button>
+    </div>
+
+    <!-- Sign In -->
+    <div id="tab-login" class="login-form-panel active">
+      <div class="form-group">
+        <label>Username or Student ID</label>
+        <input type="text" id="login-username" placeholder="e.g. 2023-12345" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-password-wrap">
+          <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password">
+          <button type="button" class="toggle-pw" onclick="togglePw('login-password', this)">👁</button>
+        </div>
+      </div>
+      <div class="login-row">
+        <label class="checkbox-label"><input type="checkbox" id="remember-me"> Remember me</label>
+        <a href="#" class="login-link">Forgot password?</a>
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+      <div class="login-divider"><span>or sign in as</span></div>
+      <button class="btn-secondary" onclick="loginAs('admin')">🔐 Admin Login</button>
+      <button class="btn-secondary" onclick="loginAs('student')">🎓 Student Demo</button>
+      <div id="login-error" class="login-error" style="display:none"></div>
+    </div>
+
+    <!-- Register -->
+    <div id="tab-register" class="login-form-panel">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Juan Dela Cruz">
+      </div>
+      <div class="form-group">
+        <label>Student ID</label>
+        <input type="text" id="reg-id" placeholder="2023-12345">
+      </div>
+      <div class="form-group">
+        <label>Year & Section</label>
+        <select id="reg-section">
+          <option value="">Select your section</option>
+          <option>DIT 2-1</option><option>DIT 2-2</option><option>DIT 2-3</option>
+          <option>DIT 2-4</option><option>DIT 2-5</option><option>DIT 2-6</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-password-wrap">
+          <input type="password" id="reg-password" placeholder="Create a password">
+          <button type="button" class="toggle-pw" onclick="togglePw('reg-password', this)">👁</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="handleRegister()">Create Account</button>
+      <div id="reg-error" class="login-error" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app" class="app" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">PUP Safety System</span>
+        <span class="brand-sub">Polytechnic University of the Philippines</span>
+      </div>
+    </div>
+
+    <div class="sidebar-user" id="sidebar-user">
+      <div class="user-avatar" id="user-avatar">JS</div>
+      <div class="user-info">
+        <span class="user-name" id="user-display-name">Tzi Rayos</span>
+        <span class="user-role" id="user-role-badge">Student</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-link" data-section="feedback">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/></svg>
+        Classroom Feedback
+      </a>
+      <a href="#" class="nav-link" data-section="readiness">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        Disaster Readiness
+      </a>
+      <a href="#" class="nav-link" data-section="map">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clip-rule="evenodd"/></svg>
+        Hazard Map
+      </a>
+      <a href="#" class="nav-link active" data-section="dashboard">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-link" data-section="history">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+        Request History
+      </a>
+      <a href="#" class="nav-link" data-section="report">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a1 1 0 001 1h8a1 1 0 001-1v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a1 1 0 00-1-1H6a1 1 0 00-1 1zm2 0h6v3H7V4zm-1 9v-2h8v2H6zm-2-4a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/></svg>
+        Print Report
+      </a>
+      <a href="#" class="nav-link admin-only" data-section="admin" id="admin-nav-link" style="display:none">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/></svg>
+        Admin Panel
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="handleLogout()">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="page-title" id="page-title">Dashboard</h2>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn urgent-btn" onclick="showSection('readiness')">⚠️ Urgent Report</button>
+        <div class="topbar-notif" id="notif-hub"></div>
+        <div class="topbar-time" id="topbar-time"></div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD SECTION -->
+    <section id="section-dashboard" class="section active">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fef2f2;color:#8B1A1A">🌡️</div>
+          <div class="stat-body">
+            <div class="stat-value" id="comfort-val">67%</div>
+            <div class="stat-label">Room Comfort</div>
+          </div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:67%;background:#8B1A1A"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#f0fdf4;color:#10b981">🛡️</div>
+          <div class="stat-body">
+            <div class="stat-value" style="color:#10b981">Safe</div>
+            <div class="stat-label">School Status</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fffbeb;color:#f59e0b">📋</div>
+          <div class="stat-body">
+            <div class="stat-value" id="dash-pending">0</div>
+            <div class="stat-label">Pending Reports</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#eff6ff;color:#3b82f6">📅</div>
+          <div class="stat-body">
+            <div class="stat-value">Jun 15</div>
+            <div class="stat-label">Next Active Drill</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3>Hazard Overview</h3>
+            <button class="card-action" onclick="showSection('map')">View Full Map →</button>
+          </div>
+          <div id="mini-map" style="height:280px;border-radius:10px;overflow:hidden;"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Activity</h3>
+          </div>
+          <div id="recent-activity" class="activity-feed">
+            <div class="activity-empty">No recent reports</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-grid">
+          <button class="action-card" onclick="showSection('feedback')">
+            <span class="action-icon">📝</span>
+            <span>Submit Feedback</span>
+          </button>
+          <button class="action-card" onclick="showSection('readiness')">
+            <span class="action-icon">🚨</span>
+            <span>Report Hazard</span>
+          </button>
+          <button class="action-card" onclick="showSection('map')">
+            <span class="action-icon">🗺️</span>
+            <span>Open Map</span>
+          </button>
+          <button class="action-card" onclick="showSection('history')">
+            <span class="action-icon">📊</span>
+            <span>View History</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HAZARD MAP SECTION -->
+    <section id="section-map" class="section">
+      <div class="map-toolbar">
+        <div class="map-legend">
+          <span class="legend-dot" style="background:#2563eb"></span> You
+          <span class="legend-dot" style="background:#10b981"></span> Resources
+          <span class="legend-dot" style="background:#ef4444"></span> Hazard
+          <span class="legend-dot" style="background:#f59e0b"></span> Evacuation
+        </div>
+        <div class="map-actions">
+          <select id="map-pin-type" class="select-sm">
+            <option value="hazard">🔴 Hazard</option>
+            <option value="resource">🟢 Resource</option>
+            <option value="evacuation">🟡 Evacuation Route</option>
+          </select>
+          <button class="btn-sm btn-danger" id="map-toggle-btn" onclick="toggleMapPin()">📍 Click to Pin</button>
+          <button class="btn-sm" onclick="clearMyPins()">🗑 Clear My Pins</button>
+        </div>
+      </div>
+      <div id="full-map" style="height:520px;border-radius:12px;overflow:hidden;border:2px solid #e2e8f0;"></div>
+      <div class="map-pins-list" id="pins-list"></div>
+    </section>
+
+    <!-- FEEDBACK SECTION -->
+    <section id="section-feedback" class="section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Classroom Feedback</h2>
+          <p>Help us improve your learning environment</p>
+        </div>
+        <form id="feedbackForm" class="styled-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" id="fb-name" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+              <label>Year & Section</label>
+              <select id="fb-section">
+                <option value="">Select section</option>
+                <option>DIT 2-1</option><option>DIT 2-2</option><option>DIT 2-3</option>
+                <option>DIT 2-4</option><option>DIT 2-5</option><option>DIT 2-6</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Room Number</label>
+            <select id="fb-room">
+              <option value="">Select room</option>
+              <option value="101">Room 101</option><option value="102">Room 102</option>
+              <option value="201">Room 201</option><option value="202">Room 202</option>
+              <option value="203">Room 203</option><option value="301">Room 301</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Classroom Rating</label>
+            <div class="star-rating" id="star-rating">
+              <button type="button" class="star" data-val="1">★</button>
+              <button type="button" class="star" data-val="2">★</button>
+              <button type="button" class="star" data-val="3">★</button>
+              <button type="button" class="star" data-val="4">★</button>
+              <button type="button" class="star" data-val="5">★</button>
+            </div>
+            <input type="hidden" id="fb-rating" value="0">
+          </div>
+          <div class="form-group">
+            <label>Issues Observed <span class="tag-required">optional</span></label>
+            <div class="checkbox-pills">
+              <label class="pill"><input type="checkbox" name="issues" value="Poor Lighting"> Poor Lighting</label>
+              <label class="pill"><input type="checkbox" name="issues" value="Damaged Chairs"> Damaged Chairs</label>
+              <label class="pill"><input type="checkbox" name="issues" value="No Ventilation"> No Ventilation</label>
+              <label class="pill"><input type="checkbox" name="issues" value="Broken Projector"> Broken Projector</label>
+              <label class="pill"><input type="checkbox" name="issues" value="No Exit Sign"> No Exit Sign</label>
+              <label class="pill"><input type="checkbox" name="issues" value="No Fire Extinguisher"> No Fire Extinguisher</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Suggestions for Improvement</label>
+            <textarea id="fb-suggestions" rows="4" placeholder="Describe any safety concerns or suggestions..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label"><input type="checkbox" id="fb-anon"> Submit anonymously</label>
+          </div>
+          <button type="submit" class="btn-submit">Submit Feedback</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- READINESS SECTION -->
+    <section id="section-readiness" class="section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Disaster Preparedness Survey</h2>
+          <p>Help us assess and improve school safety readiness</p>
+        </div>
+        <form id="readinessForm" class="styled-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Address</label>
+              <input type="text" id="rd-address" placeholder="Street, Barangay, City">
+            </div>
+            <div class="form-group">
+              <label>Emergency Contact Number</label>
+              <input type="tel" id="rd-contact" placeholder="09xxxxxxxxx">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Do you know evacuation routes in your school?</label>
+            <div class="radio-group">
+              <label class="radio-pill"><input type="radio" name="evacpath" value="yes"> ✅ Yes, I know them</label>
+              <label class="radio-pill"><input type="radio" name="evacpath" value="no"> ❌ No, I don't</label>
+              <label class="radio-pill"><input type="radio" name="evacpath" value="some"> ⚠️ Only some</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>What necessities are MISSING in your classroom?</label>
+            <div class="checkbox-pills">
+              <label class="pill"><input type="checkbox" name="necessity" value="First Aid Kit"> 🩺 First Aid Kit</label>
+              <label class="pill"><input type="checkbox" name="necessity" value="Flashlight"> 🔦 Flashlight</label>
+              <label class="pill"><input type="checkbox" name="necessity" value="Exit Signage"> 🚪 Exit Signage</label>
+              <label class="pill"><input type="checkbox" name="necessity" value="Fire Extinguisher"> 🧯 Fire Extinguisher</label>
+              <label class="pill"><input type="checkbox" name="necessity" value="Emergency Kit"> 🎒 Emergency Kit</label>
+              <label class="pill"><input type="checkbox" name="necessity" value="Smoke Detector"> 🔔 Smoke Detector</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Urgency Level</label>
+            <div class="radio-group">
+              <label class="radio-pill low"><input type="radio" name="urgency" value="low"> 🟢 Low</label>
+              <label class="radio-pill med"><input type="radio" name="urgency" value="medium"> 🟡 Medium</label>
+              <label class="radio-pill high"><input type="radio" name="urgency" value="high"> 🔴 High / Urgent</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Describe the situation or past disaster experience</label>
+            <textarea id="rd-experience" rows="5" placeholder="Please describe any safety incidents, hazards, or past disaster experiences..."></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Submit Report</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- HISTORY SECTION -->
+    <section id="section-history" class="section">
+      <div class="history-header">
+        <div class="history-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="Classroom Feedback">Feedback</button>
+          <button class="filter-btn" data-filter="Disaster Readiness">Readiness</button>
+        </div>
+        <button class="btn-sm" onclick="clearHistory()">Clear History</button>
+      </div>
+      <div id="history-list" class="history-list">
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>No submissions yet. Submit a report to see it here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRINT REPORT SECTION -->
+    <section id="section-report" class="section">
+      <div class="report-controls card" style="margin-bottom:20px">
+        <div class="card-header">
+          <h3>📄 Generate Printable Report</h3>
+        </div>
+        <div class="report-options">
+          <div class="report-option-group">
+            <label class="report-label">Report Type</label>
+            <div class="radio-group">
+              <label class="radio-pill"><input type="radio" name="rpt-type" value="all" checked> All Reports</label>
+              <label class="radio-pill"><input type="radio" name="rpt-type" value="Classroom Feedback"> Feedback Only</label>
+              <label class="radio-pill"><input type="radio" name="rpt-type" value="Disaster Readiness"> Readiness Only</label>
+            </div>
+          </div>
+          <div class="report-option-group">
+            <label class="report-label">Filter by Status</label>
+            <div class="radio-group">
+              <label class="radio-pill"><input type="radio" name="rpt-status" value="all" checked> All Status</label>
+              <label class="radio-pill"><input type="radio" name="rpt-status" value="URGENT"> Urgent Only</label>
+              <label class="radio-pill"><input type="radio" name="rpt-status" value="pending"> Pending Only</label>
+              <label class="radio-pill"><input type="radio" name="rpt-status" value="resolved"> Resolved Only</label>
+            </div>
+          </div>
+          <div class="report-option-group">
+            <label class="report-label">Date Range</label>
+            <div class="report-date-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label>From</label>
+                <input type="date" id="rpt-date-from">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label>To</label>
+                <input type="date" id="rpt-date-to">
+              </div>
+            </div>
+          </div>
+          <div class="report-option-group">
+            <label class="report-label">Include Sections</label>
+            <div class="checkbox-pills">
+              <label class="pill"><input type="checkbox" id="inc-summary" checked> Summary Stats</label>
+              <label class="pill"><input type="checkbox" id="inc-table" checked> Report Table</label>
+              <label class="pill"><input type="checkbox" id="inc-pins" checked> Map Pin List</label>
+              <label class="pill"><input type="checkbox" id="inc-chart" checked> Status Chart</label>
+            </div>
+          </div>
+          <div class="report-action-row">
+            <button class="btn-submit" onclick="previewReport()">👁 Preview Report</button>
+            <button class="btn-submit" style="background:#1d4ed8" onclick="printReport()">🖨️ Print / Save PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE PREVIEW -->
+      <div class="card" id="report-preview-card" style="display:none">
+        <div class="card-header">
+          <h3>Preview</h3>
+          <button class="btn-sm" onclick="document.getElementById('report-preview-card').style.display='none'">✕ Close</button>
+        </div>
+        <div id="report-preview-body" style="padding:20px"></div>
+      </div>
+    </section>
+
+    <!-- ADMIN SECTION -->
+    <section id="section-admin" class="section">
+      <div class="admin-stats">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fffbeb;color:#f59e0b">⏳</div>
+          <div class="stat-body">
+            <div class="stat-value" id="admin-pending">0</div>
+            <div class="stat-label">Pending</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fef2f2;color:#ef4444">🚨</div>
+          <div class="stat-body">
+            <div class="stat-value" id="admin-urgent">0</div>
+            <div class="stat-label">Urgent</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#f0fdf4;color:#10b981">✅</div>
+          <div class="stat-body">
+            <div class="stat-value" id="admin-resolved">0</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#eff6ff;color:#3b82f6">📍</div>
+          <div class="stat-body">
+            <div class="stat-value" id="admin-pins">0</div>
+            <div class="stat-label">Map Pins</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Live Request Management</h3>
+          <div class="admin-controls">
+            <select id="admin-filter" onchange="renderAdminTable()">
+              <option value="all">All Status</option>
+              <option value="URGENT">Urgent</option>
+              <option value="pending">Pending</option>
+              <option value="resolved">Resolved</option>
+            </select>
+            <button class="btn-danger" onclick="broadcastAlert()">📢 Broadcast Alert</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>Type</th>
+                <th>Details</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="auth.js"></script>
+<script src="map.js"></script>
+<script src="app.js"></script>
+<script src="print.js"></script>
+</body>
+</html>
