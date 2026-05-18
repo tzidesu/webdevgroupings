@@ -10,6 +10,7 @@
 </head>
 <body>
 
+<!-- LOG-IN -->
 <div id="login-page" class="login-page">
   <div class="login-bg">
     <div class="login-bg-overlay"></div>
@@ -53,6 +54,7 @@
       <div id="login-error" class="login-error" style="display:none"></div>
     </div>
 
+    <!-- REGISTER -->
     <div id="tab-register" class="login-form-panel">
       <div class="form-group">
         <label>Full Name</label>
@@ -83,6 +85,7 @@
   </div>
 </div>
 
+<!-- LOGO AND USER INFO -->
 <div id="app" class="app" style="display:none">
 
   <aside class="sidebar" id="sidebar">
@@ -94,6 +97,7 @@
       </div>
     </div>
 
+    
     <div class="sidebar-user" id="sidebar-user">
       <div class="user-avatar" id="user-avatar">JS</div>
       <div class="user-info">
@@ -102,6 +106,7 @@
       </div>
     </div>
 
+    <!-- NAVIGATION BAR -->
     <nav class="sidebar-nav">
       <a href="#" class="nav-link" data-section="feedback">
         <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/></svg>
@@ -143,6 +148,7 @@
 
   <main class="main">
 
+    <!-- DASHBOARD -->
     <header class="topbar">
       <div class="topbar-left">
         <h2 class="page-title" id="page-title">Dashboard</h2>
@@ -228,6 +234,7 @@
       </div>
     </section>
 
+    <!-- HAZARD MAP -->
     <section id="section-map" class="section">
       <div class="map-toolbar">
         <div class="map-legend">
@@ -250,6 +257,7 @@
       <div class="map-pins-list" id="pins-list"></div>
     </section>
 
+    <!-- CLASSROOM FEEDBACK FORM -->
     <section id="section-feedback" class="section">
       <div class="form-card">
         <div class="form-card-header">
@@ -314,6 +322,7 @@
       </div>
     </section>
 
+    <!-- DISASTER PREPAREDNESS FORM -->
     <section id="section-readiness" class="section">
       <div class="form-card">
         <div class="form-card-header">
@@ -367,6 +376,8 @@
       </div>
     </section>
 
+
+    <!-- REQUEST HISTORY -->
     <section id="section-history" class="section">
       <div class="history-header">
         <div class="history-filters">
@@ -384,6 +395,8 @@
       </div>
     </section>
 
+
+    <!-- PRINT REPORT -->
     <section id="section-report" class="section">
       <div class="report-controls card" style="margin-bottom:20px">
         <div class="card-header">
@@ -445,6 +458,8 @@
       </div>
     </section>
 
+
+    <!-- ADMIN PANEL -->
     <section id="section-admin" class="section">
       <div class="admin-stats">
         <div class="stat-card">
@@ -512,6 +527,7 @@
 
 <div id="toast-container"></div>
 
+<!-- JAVASCRIPT  -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="auth.js"></script>
 <script src="map.js"></script>
