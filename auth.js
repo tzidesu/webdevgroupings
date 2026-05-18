@@ -1,4 +1,3 @@
-
 const DEMO_USERS = [
   { username: "admin",       password: "admin123",   role: "admin",   name: "Admin",    section: "Faculty" },
   { username: "student",     password: "student123", role: "student", name: "James Lao",   section: "DIT 2-3" },
@@ -72,7 +71,7 @@ function loginAs(role) {
   }
 }
 
-// ── HANDLE REGISTER ───────────────────────────────────────
+// ── HANDLE REGISTER (COMBINED AND FIXED) ───────────────────
 function handleRegister() {
   const name     = document.getElementById("reg-name").value.trim();
   const id       = document.getElementById("reg-id").value.trim();
@@ -80,21 +79,32 @@ function handleRegister() {
   const password = document.getElementById("reg-password").value;
   const errEl    = document.getElementById("reg-error");
 
+  // 1. Check if empty
   if (!name || !id || !section || !password) {
     showLoginError(errEl, "Please fill in all fields.");
     return;
   }
 
+  // 2. UX FIX: Check if the name contains numbers or symbols
+  const nameRegex = /^[a-zA-Z\s.\-]+$/;
+  if (!nameRegex.test(name)) {
+    showLoginError(errEl, "⚠️ Full Name should only contain letters, spaces, hyphens, or periods.");
+    return;
+  }
+
+  // 3. Password length validation
   if (password.length < 6) {
     showLoginError(errEl, "Password must be at least 6 characters.");
     return;
   }
 
+  // 4. Duplicate ID check
   if (DEMO_USERS.find(u => u.username === id)) {
     showLoginError(errEl, "Student ID already registered.");
     return;
   }
 
+  // 5. Success Flow: Add to array, save state, and trigger redirect
   const newUser = { username: id, password, role: "student", name, section };
   DEMO_USERS.push(newUser);
   saveSession(newUser);
@@ -104,22 +114,18 @@ function handleRegister() {
 
 // ── BOOT APP AFTER LOGIN ──────────────────────────────────
 function bootApp(user) {
-  // Hide login, show app
   document.getElementById("login-page").style.display = "none";
   document.getElementById("app").style.display = "flex";
 
-  // Set user info in sidebar
   const initials = user.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
   document.getElementById("user-avatar").textContent = initials;
   document.getElementById("user-display-name").textContent = user.name;
   document.getElementById("user-role-badge").textContent =
     user.role === "admin" ? "🔐 Administrator" : `🎓 ${user.section}`;
 
-  // Show/hide admin nav
   const adminLink = document.getElementById("admin-nav-link");
   if (adminLink) adminLink.style.display = user.role === "admin" ? "flex" : "none";
 
-  // Pre-fill feedback name if not anonymous
   const fbName = document.getElementById("fb-name");
   if (fbName) fbName.value = user.name;
 
@@ -130,7 +136,6 @@ function bootApp(user) {
     });
   }
 
-  // Initialize app
   if (typeof initApp === "function") initApp(user);
 }
 
@@ -141,7 +146,6 @@ function handleLogout() {
   document.getElementById("app").style.display = "none";
   document.getElementById("login-page").style.display = "flex";
 
-  // Clear form fields
   document.getElementById("login-username").value = "";
   document.getElementById("login-password").value = "";
   document.getElementById("login-error").style.display = "none";
