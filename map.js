@@ -1,4 +1,4 @@
-const PUP_CENTER = [14.5995, 120.9842];
+const PUP_CENTER = [14.598167, 121.010773];
 const PUP_ZOOM   = 17;
 
 let fullMap  = null;
